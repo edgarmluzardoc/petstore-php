@@ -1,0 +1,34 @@
+version: '3.1'
+services:
+    nginx:
+        image: nginx:latest
+        container_name: petstore-nginx
+        ports:
+            - '8083:80'
+        volumes:
+            - ./code:/var/www/html
+            - ./site.conf:/etc/nginx/conf.d/site.conf
+        links:
+            - php
+
+    php:
+        build:
+            context: .
+        container_name: petstore-web
+        env_file:
+            - ./code/.env
+        volumes:
+            - ./code:/var/www/html
+        links:
+            - db
+
+    db:
+        # MySQL
+        image: mysql:8.0
+        container_name: petstore-db
+        restart: always
+        command: --default-authentication-plugin=mysql_native_password
+        ports:
+            - '8082:3306'
+        env_file:
+            - ./code/.env
