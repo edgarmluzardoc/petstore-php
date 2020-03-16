@@ -3,6 +3,10 @@
 namespace App\Helpers;
 
 use App\Entity\Pet;
+use App\Helpers\{
+    CategoryHelper,
+    TagHelper,
+};
 
 class PetHelper
 {
@@ -12,23 +16,12 @@ class PetHelper
      */
     public static function getModel(Pet $pet): array
     {
-        $category = $pet->getCategory();
-        $tagsResults = $pet->getTags()->toArray();
-
-        $tags = [];
-        foreach ($tagsResults as $tag) {
-            $tags[] = [
-                'id' => $tag->getId(),
-                'name' => $tag->getName(),
-            ];
-        }
+        $category = CategoryHelper::getModel($pet->getCategory());
+        $tags = TagHelper::getTagsModel($pet->getTags()->toArray());
 
         return [
             'id' => $pet->getId(),
-            'category' => [
-                'id' => $category->getId(),
-                'name' => $category->getName(),
-            ],
+            'category' => $category,
             'name' => $pet->getName(),
             'photoUrls' => $pet->getPhotoUrls(),
             'tags' => $tags,
