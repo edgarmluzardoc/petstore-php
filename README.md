@@ -1,7 +1,6 @@
-# Base Project
+# Petstore PHP
 
-Petstore API with PHP
-
+Petstore API with PHP following these standards: https://petstore.swagger.io/
 
 ## Pre-Requisites
 
@@ -11,7 +10,9 @@ Petstore API with PHP
 ## How to run
 
 1. Clone project and go into its root directory.
-1. Run `docker-compose up -d`
+1. Run `docker-compose up -d && docker exec -it petstore-web bash`
+1. Run database migration: `php bin/console doctrine:migrations:migrate`
+1. Load database fixtures: `php bin/console doctrine:fixtures:load`
 1. Go to http://petstore.local:8083/ (you should see a Symfony Welcome page)
 1. All set!
 
