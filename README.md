@@ -23,3 +23,9 @@ These are the default variables for the DB (update them in `code/.env` if needed
 1. DB name: `petstoredb`
 1. User name: `petstoreuser`
 1. User pass: `petstorepass`
+
+ ## Unit testing
+
+- Go into the `petstore-web` container: `docker-compose exec petstore-web bash`
+- Then run: `bin/phpunit tests/`
+- You should see an OK message with the number of tests and assertions.
