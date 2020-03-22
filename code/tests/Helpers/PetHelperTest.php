@@ -2,10 +2,18 @@
 
 namespace App\Tests\Helpers;
 
-use App\Entity\Pet;
-use App\Helpers\PetHelper;
-use PHPUnit\Framework\TestCase;
+use App\Entity\{
+    Category,
+    Pet,
+    Tag,
+};
+use App\Helpers\{
+    CategoryHelper,
+    PetHelper,
+    TagHelper,
+};
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
 class PetHelperTest extends TestCase
 {
@@ -29,6 +37,20 @@ class PetHelperTest extends TestCase
         $testPet->setPhotoUrls($petValues['photoUrls']);
         $testPet->setStatus($petValues['status']);
 
+        $category = $petValues['category'] ?? null;
+        if (!empty($category)) {
+            $testPet->setCategory($category);
+        }
+
+        $tags = $petValues['tags'] ?? null;
+        if (!empty($tags)) {
+            foreach ($tags as $tag) {
+                $testPet->addTag($tag);
+            }
+            // Remove last tag to test removeTag functionality
+            $testPet->removeTag(end($tags));
+        }
+
         $result = PetHelper::getModel($testPet);
         $this->assertEquals($result, $expected);
     }
@@ -40,6 +62,17 @@ class PetHelperTest extends TestCase
     {
         $testName = 'Test pet';
         $testPhotoUrls = ['url1', 'url2'];
+
+        $testCategory = new Category();
+        $testCategory->setName('Test category');
+
+        $testTag = new Tag();
+        $testTag->setName('Test tag');
+        $testTag2 = new Tag();
+        $testTag2->setName('Test tag 2');
+        $testTag3 = new Tag();    
+        $testTag3->setName('Test tag 3');
+        $testTags = [$testTag, $testTag2, $testTag3];
 
         $testCases = [
             'Incorrect status' => [
@@ -65,13 +98,15 @@ class PetHelperTest extends TestCase
                     'name' => $testName,
                     'photoUrls' => $testPhotoUrls,
                     'status' => $availableStatus,
+                    'category' => $testCategory,
+                    'tags' => $testTags,
                 ],
                 [
                     'id' => null,
-                    'category' => [],
+                    'category' => CategoryHelper::getModel($testCategory),
                     'name' => $testName,
                     'photoUrls' => $testPhotoUrls,
-                    'tags' => [],
+                    'tags' => TagHelper::getTagsModel([$testTag, $testTag2]),
                     'status' => $availableStatus,
                 ],
             ];

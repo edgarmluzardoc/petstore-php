@@ -2,20 +2,42 @@
 
 namespace App\Tests\Helpers;
 
-use App\Entity\Tag;
+use App\Entity\{
+    Pet,
+    Tag,
+};
 use App\Helpers\TagHelper;
 use PHPUnit\Framework\TestCase;
 
 class TagHelperTest extends TestCase
 {
     /**
-     * @param Tag|null $tag
+     * @param array|null $tagValues
      * @param array $expected
      * @dataProvider dataProviderTestGetModel
      */
-    public function testGetModel(?Tag $tag, array $expected)
+    public function testGetModel(?array $tagValues, array $expected)
     {
-        $result = TagHelper::getModel($tag);
+        $testTag = null;
+        if (!empty($tagValues)) {
+            $testTag = new Tag();
+            $testTag->setName($tagValues['name']);
+
+            // Testing pet actions
+            $pets = $tagValues['pets'] ?? null;
+            if (!empty($pets)) {
+                foreach ($pets as $pet) {
+                    $testTag->addPet($pet);
+                }
+                // Remove pet to test removePet
+                $testTag->removePet(end($pets));
+
+                $this->assertEquals($testTag->getPets()->toArray(), $expected['pets']);
+                unset($expected['pets']);
+            }
+        }
+
+        $result = TagHelper::getModel($testTag);
         $this->assertEquals($result, $expected);
     }
 
@@ -24,8 +46,11 @@ class TagHelperTest extends TestCase
      */
     public function dataProviderTestGetModel()
     {
-        $testTag = new Tag();
-        $testTag->setName('Test tag');
+        $testName = 'Test tag';
+
+        $testPet = new Pet();
+        $testPet2 = new Pet();
+        $testPets = [$testPet, $testPet2];
 
         return [
             'Empty tag' => [
@@ -33,10 +58,14 @@ class TagHelperTest extends TestCase
                 [],
             ],
             'Tag 1' => [
-                $testTag,
                 [
-                    'id' => $testTag->getId(),
-                    'name' => $testTag->getName(),
+                    'name' => $testName,
+                    'pets' => $testPets,
+                ],
+                [
+                    'id' => null,
+                    'name' => $testName,
+                    'pets' => [$testPet],
                 ],
             ],
         ];
