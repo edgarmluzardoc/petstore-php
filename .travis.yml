@@ -2,8 +2,8 @@ language: php
 php:
     - 7.3
 
-install:
-    - travis_retry composer install --no-interaction --no-suggest
+# install:
+#     - travis_retry composer install --no-interaction --no-suggest
 
 script:
     bin/phpunit tests/ --coverage-clover=coverage.xml
